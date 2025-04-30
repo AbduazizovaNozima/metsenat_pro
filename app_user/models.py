@@ -52,15 +52,6 @@ class CustomUser(AbstractUser):
     objects = CustomerUserManager()
 
 
-class CodeVerification(BaseModel):
-    code = models.CharField(max_length=255)
-    user = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name='code_verifies'
-    )
-
-
-
-
 
 
 

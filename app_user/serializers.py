@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from . import models
-import random
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -21,13 +20,8 @@ class RegisterSerializer(serializers.Serializer):
 
             user.full_name = full_name
             user.password = password
+            user.login = login
             user.save()
-
-            verification = models.CodeVerification.objects.filter(
-                user=user
-            )
-            verification.delete()
-            self.create_verify_code(user)
 
             return user
 
@@ -36,18 +30,4 @@ class RegisterSerializer(serializers.Serializer):
                 phone=phone, password=password, full_name=full_name
             )
 
-            self.create_verify_code(user)
-
             return user
-
-    @classmethod
-    def create_verify_code(cls, user):
-        code = cls.generate_random_number()
-        models.CodeVerification.objects.create(
-            user=user, code=code
-        )
-
-    @staticmethod
-    def generate_random_number():
-        return ''.join([str(random.randint(0,9)) for _ in range(4)])
-
