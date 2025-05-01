@@ -14,4 +14,3 @@ class UserTypeChoices(TextChoices):
     LEGAL = 'legal', 'Legal'
 
 
-NEW, ACTIVE = 'new', 'active'
