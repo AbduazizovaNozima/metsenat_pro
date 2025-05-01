@@ -1,7 +1,6 @@
-from project.urls import path
-from . import views
-
+from django.urls import path
+from .views import LoginView
 
 urlpatterns = [
-    path("register/", views.RegisterAPIView.as_view()),
+    path('login/', LoginView.as_view()),
 ]

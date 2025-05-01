@@ -1,33 +1,25 @@
 from rest_framework import serializers
-from . import models
+from django.contrib.auth import authenticate
+from .models import CustomUser
 
+class LoginSerializer(serializers.Serializer):
+    login = serializers.CharField()
+    password = serializers.CharField(write_only=True)
 
-class RegisterSerializer(serializers.Serializer):
-    full_name = serializers.CharField(max_length=255, required=True, write_only=True)
-    phone = serializers.CharField(max_length=255, required=True, write_only=True)
-    password = serializers.CharField(max_length=255, required=True, write_only=True)
+    def validate(self, data):
+        login = data.get('login')
+        password = data.get('password')
 
+        try:
+            user = CustomUser.objects.get(login=login)
+        except CustomUser.DoesNotExist:
+            raise serializers.ValidationError("Login noto‘g‘ri")
 
-    def create(self, validated_data):
-        full_name = validated_data.get('full_name')
-        phone = validated_data.get('phone')
-        password = validated_data.get('password')
-        login = validated_data.get('login')
+        if not user.check_password(password):
+            raise serializers.ValidationError("Parol noto‘g‘ri")
 
-        user = models.CustomUser.objects.filter(phone=phone).first()
+        if not user.is_active:
+            raise serializers.ValidationError("Foydalanuvchi aktiv emas")
 
-        if user:
-
-            user.full_name = full_name
-            user.password = password
-            user.login = login
-            user.save()
-
-            return user
-
-        else:
-            user = models.CustomUser.objects.create_user(
-                phone=phone, password=password, full_name=full_name
-            )
-
-            return user
+        data['user'] = user
+        return data
